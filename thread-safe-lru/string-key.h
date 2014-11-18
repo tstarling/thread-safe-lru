@@ -82,8 +82,6 @@ class ThreadSafeStringKey {
       char * m_data;
       size_t m_size;
       mutable std::atomic<size_t> m_hash;
-      enum {Multiplier32 = 2654435769U};
-      enum {Multiplier64 = 11400714819323198485ULL};
 
       size_t hash() const {
         size_t h = m_hash.load(std::memory_order_relaxed);
