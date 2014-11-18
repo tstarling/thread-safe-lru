@@ -22,6 +22,8 @@
 #include <limits>
 #include <memory>
 
+#include "thread-safe-lru/hash.h"
+
 namespace tstarling {
 
 class ThreadSafeStringKey {
@@ -86,14 +88,9 @@ class ThreadSafeStringKey {
       size_t hash() const {
         size_t h = m_hash.load(std::memory_order_relaxed);
         if (h == 0) {
-          const char* end = m_data + m_size;
-          for(const char* c = m_data; c < end; ++c) {
-            if (std::numeric_limits<size_t>::digits == 32) {
-              h = static_cast<size_t>(*c) ^ (h * Multiplier32);
-            } else {
-              h = static_cast<size_t>(*c) ^ (h * Multiplier64);
-            }
-          }
+          uint64_t h128[2];
+          MurmurHash3::hash128<false>(m_data, m_size, 0, h128);
+          h = (size_t)h128[0];
           if (h == 0) {
             h = 1;
           }

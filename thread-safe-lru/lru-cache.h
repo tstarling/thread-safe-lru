@@ -114,11 +114,15 @@ class ThreadSafeLRUCache {
         ConstAccessor() {}
 
         const TValue& operator*() const {
-          return m_hashAccessor->m_value;
+          return *get();
         }
 
         const TValue* operator->() const {
-          return &m_hashAccessor->m_value;
+          return get();
+        }
+
+        const TValue * get() const {
+          return &m_hashAccessor->second.m_value;
         }
 
         bool empty() const {
@@ -130,12 +134,12 @@ class ThreadSafeLRUCache {
         HashMapConstAccessor m_hashAccessor;
     };
 
-	/**
-	 * Create a container with a given maximum size
-	 */
+    /**
+     * Create a container with a given maximum size
+     */
     explicit ThreadSafeLRUCache(size_t maxSize);
 
-	ThreadSafeLRUCache(const ThreadSafeLRUCache & other) = delete;
+    ThreadSafeLRUCache(const ThreadSafeLRUCache & other) = delete;
 
     ~ThreadSafeLRUCache() {
       clear();
