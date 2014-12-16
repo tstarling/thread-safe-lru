@@ -26,8 +26,7 @@
 
 namespace tstarling {
 
-class ThreadSafeStringKey {
-public:
+struct ThreadSafeStringKey {
   ThreadSafeStringKey(const char* data, size_t size)
     : m_storage(new Storage(data, size))
   {}
@@ -61,7 +60,7 @@ public:
     }
 
     size_t hash(const ThreadSafeStringKey& k) const {
-      return (size_t)k.hash();
+      return k.hash();
     }
   };
 

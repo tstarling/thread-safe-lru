@@ -49,9 +49,8 @@ namespace tstarling {
  * TBB::CHM. So if that is a possibility for your workload,
  * ThreadSafeScalableCache is recommended instead.
  */
-template <class TKey, class TValue, class THash = tbb::tbb_hash_compare<TKey> >
+template <class TKey, class TValue, class THash = tbb::tbb_hash_compare<TKey>>
 class ThreadSafeLRUCache {
-private:
   /**
    * The LRU list node.
    *
@@ -109,8 +108,7 @@ public:
    * the user's value by dereferencing, thus hiding our implementation
    * details.
    */
-  class ConstAccessor {
-  public:
+  struct ConstAccessor {
     ConstAccessor() {}
 
     const TValue& operator*() const {
@@ -140,7 +138,7 @@ public:
   explicit ThreadSafeLRUCache(size_t maxSize);
 
   ThreadSafeLRUCache(const ThreadSafeLRUCache& other) = delete;
-  ThreadSafeLRUCache & operator=(const ThreadSafeLRUCache&) = delete;
+  ThreadSafeLRUCache& operator=(const ThreadSafeLRUCache&) = delete;
 
   ~ThreadSafeLRUCache() {
     clear();
@@ -268,7 +266,6 @@ find(ConstAccessor& ac, const TKey& key) {
       delink(node);
       pushFront(node);
     }
-    atomic_thread_fence(std::memory_order_seq_cst);
     lock.unlock();
   }
   return true;
@@ -302,7 +299,6 @@ insert(const TKey& key, const TValue& value) {
   // exist.
   std::unique_lock<ListMutex> lock(m_listMutex);
   pushFront(node);
-  atomic_thread_fence(std::memory_order_seq_cst);
   lock.unlock();
   if (!evictionDone) {
     size = m_size++;

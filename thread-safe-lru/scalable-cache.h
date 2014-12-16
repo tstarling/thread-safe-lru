@@ -34,12 +34,11 @@ namespace tstarling {
  * deferred until all ConstAccessor objects are destroyed.
  * 
  * Since the hash value of each key is requested multiple times, you should use
- * a key with a memoized hash function. ThreadSafeStringCache is provided for
+ * a key with a memoized hash function. ThreadSafeStringKey is provided for
  * this purpose.
  */
 template <class TKey, class TValue, class THash = tbb::tbb_hash_compare<TKey>>
-class ThreadSafeScalableCache {
-public:
+struct ThreadSafeScalableCache {
   using Shard = ThreadSafeLRUCache<TKey, TValue, THash>;
   typedef typename Shard::ConstAccessor ConstAccessor;
 
@@ -133,7 +132,7 @@ ThreadSafeScalableCache(size_t maxSize, size_t numShards)
     if (i == 0) {
       s += maxSize % m_numShards;
     }
-    m_shards.push_back(ShardPtr(new Shard(s)));
+    m_shards.emplace_back(std::make_shared<Shard>(s));
   }
 }
 
