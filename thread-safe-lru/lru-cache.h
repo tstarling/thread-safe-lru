@@ -385,6 +385,7 @@ evict() {
     return;
   }
   m_map.erase(hashAccessor);
+  m_size--;
   delete moribund;
 }
 
